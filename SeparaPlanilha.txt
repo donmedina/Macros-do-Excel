@@ -1,5 +1,3 @@
-'<alteracao>
-'Divide a planilha em diversas a partir do critério do mês
 Sub lsSeparaPlanilha()
     
     'Definição das Variáveis
