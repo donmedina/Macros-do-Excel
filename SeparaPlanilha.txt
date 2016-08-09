@@ -1,0 +1,67 @@
+'<alteracao>
+'Divide a planilha em diversas a partir do critério do mês
+Sub lsSeparaPlanilha()
+    
+    'Definição das Variáveis
+    Dim iTotalLinhas As Integer
+    Dim rngAux As Range
+    Dim iVENDEU As String
+    Dim lRow As Long
+    Dim iTotalLinhasAux As Long
+    Dim lCel As Long
+    
+    'Identifica a última linha da planilha
+    iTotalLinhas = Cells(Rows.Count, 1).End(xlUp).Row
+    
+    'Seleciona os dados das colunas
+    Columns("A:O").Select
+    
+    'Realiza a ordenação dos dados pela data
+    ActiveWorkbook.Worksheets("BAIXAS GERAL").Sort.SortFields.Clear
+    ActiveWorkbook.Worksheets("BAIXAS GERAL").Sort.SortFields.Add Key:=Range("L2:L" & iTotalLinhas) _
+    , SortOn:=xlSortOnValues, Order:=xlAscending, DataOption:=xlSortNormal
+    
+    With ActiveWorkbook.Worksheets("BAIXAS GERAL").Sort
+        .SetRange Range("A1:O" & iTotalLinhas)
+        .Header = xlYes
+        .MatchCase = False
+        .Orientation = xlTopToBottom
+        .SortMethod = xlPinYin
+        .Apply
+    End With
+        
+    'Analisa as linhas e as separa criando para isso novas planilhas
+    For lCel = 2 To iTotalLinhas
+        'Ativa a planilha da base de dados
+        ActiveWorkbook.Worksheets("BAIXAS GERAL").Activate
+        Set rngAux = Range("L" & CStr(lCel))
+        
+        'Cria uma nova planilha
+        If CStr(rngAux.Value) <> iVENDEU Then
+            Worksheets.Add(After:=Worksheets(Worksheets.Count)).Name = CStr(rngAux.Value)
+            iVENDEU = CStr(rngAux.Value)
+            ActiveWorkbook.Worksheets("BAIXAS GERAL").Activate
+            Range("A1").EntireRow.Select
+            Application.CutCopyMode = False
+            Selection.Copy
+            Sheets(CStr(iVENDEU)).Select
+            Range("A1").Select
+            ActiveSheet.Paste
+        End If
+        
+        'Realiza a cópia dos dados
+        ActiveWorkbook.Worksheets("BAIXAS GERAL").Activate
+        rngAux.EntireRow.Select
+        Application.CutCopyMode = False
+        Selection.Cut
+        Sheets(CStr(iVENDEU)).Select
+        iTotalLinhas = Cells(Rows.Count, 1).End(xlUp).Row + 1
+        Range("A" & CStr(iTotalLinhas)).Select
+        ActiveSheet.Paste
+        
+    Next lCel
+    
+    'Avisa o usuário o término do processo
+    MsgBox "Planilha Separada", vbInformation
+    '</alteracao>
+End Sub

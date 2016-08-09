@@ -1,0 +1,43 @@
+Public Sub SplitSheetsToWorkbook()
+    On Error GoTo TrataErro
+ 
+    'variáveis
+    Dim newBook As Workbook
+    Dim sheet As Worksheet
+    Dim i As Byte
+ 
+    'Desativa os avisos e atualiação da tela
+    Application.ScreenUpdating = False
+    Application.DisplayAlerts = False
+ 
+    For Each sheet In ThisWorkbook.Worksheets
+        'cria uma nova pasta de trabalho:
+        Set newBook = Application.Workbooks.Add
+        'copia a planilha
+        sheet.Copy Before:=newBook.Sheets(1)
+        'remove as outras
+        For i = 2 To newBook.Worksheets.Count
+            newBook.Worksheets(2).Delete
+        Next i
+        'salva o arquivo
+        newBook.SaveAs Replace(ThisWorkbook.FullName, ThisWorkbook.Name, vbNullString) & sheet.Name & ".xlsx"
+        newBook.Close
+    Next sheet
+ 
+TrataSaida:
+    'Reativa os avisos e atualiação da tela
+    Application.ScreenUpdating = True
+    Application.DisplayAlerts = True
+ 
+    'zera as variáveis
+    Set newBook = Nothing
+    Set sheet = Nothing
+ 
+    MsgBox "Feito!"
+    Exit Sub
+ 
+TrataErro:
+    MsgBox Err.Description, vbCritical, "Erro"
+ 
+    GoTo TrataSaida
+End Sub
